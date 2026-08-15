@@ -100,16 +100,19 @@ export class AuthController {
     return { accessToken, user };
   }
 
-  @Post('logout')
+  @Post('sign-out')
   @HttpCode(HttpStatus.OK)
-  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async signOut(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const rawRefreshToken = req.cookies?.refreshToken;
 
-    await this.authService.logout(rawRefreshToken);
+    await this.authService.signOut(rawRefreshToken);
 
     res.clearCookie('refreshToken', { path: '/auth' });
 
-    return { message: 'Logged out successfully' };
+    return { message: 'Signed out successfully' };
   }
 
   @Post('resend-verification-email')

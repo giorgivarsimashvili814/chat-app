@@ -152,7 +152,7 @@ export class AuthService {
     };
   }
 
-  async logout(rawRefreshToken: string | undefined) {
+  async signOut(rawRefreshToken: string | undefined) {
     if (!rawRefreshToken) return;
 
     const tokenHash = hashToken(rawRefreshToken);
@@ -340,10 +340,7 @@ export class AuthService {
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async handleExpiredTokensCleanup() {
-    const result = await this.deleteExpiredTokens();
-    console.log(
-      `Cleaned up ${result.verificationDeleted} expired verification tokens, ${result.resetDeleted} expired reset tokens`,
-    );
+    await this.deleteExpiredTokens();
   }
 
   private async generateUniqueUsername(): Promise<string> {
