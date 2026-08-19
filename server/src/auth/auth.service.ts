@@ -131,10 +131,14 @@ export class AuthService {
         },
       });
 
-      await tx.session.update({
-        where: { id: session.id },
-        data: { revokedAt: new Date(), replacedById: created.id },
+      const result = await tx.session.updateMany({
+        where: { id: session.id, revokedAt: null },
+        data: { revokedAt: new Date() },
       });
+
+      if (result.count === 0) {
+        throw new UnauthorizedException('Session reuse detected');
+      }
     });
 
     const user = await this.users.findById(session.userId);
