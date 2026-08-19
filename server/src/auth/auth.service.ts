@@ -327,19 +327,19 @@ export class AuthService {
   async deleteExpiredTokens() {
     const now = new Date();
 
-    const [expiredVerification, expiredResets] = await Promise.all([
+    await Promise.all([
       this.prisma.emailVerificationToken.deleteMany({
         where: { expiresAt: { lt: now } },
       }),
       this.prisma.passwordResetToken.deleteMany({
         where: { expiresAt: { lt: now } },
       }),
+      this.prisma.session.deleteMany({
+        where: {
+          OR: [{ expiresAt: { lt: now } }, { revokedAt: { not: null } }],
+        },
+      }),
     ]);
-
-    return {
-      verificationDeleted: expiredVerification.count,
-      resetDeleted: expiredResets.count,
-    };
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
